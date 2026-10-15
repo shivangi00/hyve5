@@ -48,10 +48,34 @@ export async function saveProfile(formData: FormData) {
 export async function addSlot(formData: FormData) {
   const { supabase, id } = await me();
   const iso = String(formData.get('starts_at_iso') || '');
-  if (iso && !Number.isNaN(Date.parse(iso)) && Date.parse(iso) > Date.now()) {
-    await supabase.from('slots').insert({ owner_id: id, starts_at: iso, duration_min: 15 });
-  }
+  const t = Date.parse(iso);
+  if (!iso || Number.isNaN(t)) redirect('/me/edit?slot=invalid#times');
+  if (t <= Date.now()) redirect('/me/edit?slot=past#times');
+  await supabase.from('slots').insert({ owner_id: id, starts_at: iso, duration_min: 15 });
   revalidatePath('/me/edit');
+  redirect('/me/edit?slot=added#times');
+}
+
+/** Use the name and photo from one of your connected sign-in accounts (Google or LinkedIn). */
+export async function chooseIdentity(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+  const provider = String(formData.get('provider') || '');
+  const identity = user!.identities?.find((i) => i.provider === provider);
+  const d = (identity?.identity_data ?? {}) as Record<string, string | undefined>;
+  const name = d.full_name || d.name || [d.given_name, d.family_name].filter(Boolean).join(' ');
+  const photo = d.avatar_url || d.picture || null;
+  const update: Record<string, string | null> = {};
+  const both = !!formData.get('take_both');
+  if ((both || formData.get('take_name')) && name) update.full_name = name;
+  if ((both || formData.get('take_photo')) && photo) update.avatar_url = photo;
+  if (Object.keys(update).length) await supabase.from('profiles').update(update).eq('id', user!.id);
+  revalidatePath('/me');
+  revalidatePath('/me/edit');
+  redirect('/me/edit?source=updated#accounts');
 }
 
 export async function deleteSlot(formData: FormData) {

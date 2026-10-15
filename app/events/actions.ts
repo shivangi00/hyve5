@@ -16,7 +16,9 @@ export async function createEvent(formData: FormData) {
   if (!name) redirect('/events/new');
   const venue = String(formData.get('venue') || '').trim().slice(0, 80) || null;
   const endsIso = String(formData.get('ends_at_iso') || '');
-  const ends_at = endsIso && !Number.isNaN(Date.parse(endsIso)) ? endsIso : new Date(Date.now() + 5 * 3600e3).toISOString();
+  const endsT = Date.parse(endsIso);
+  if (endsIso && !Number.isNaN(endsT) && endsT <= Date.now()) redirect('/events/new?error=' + encodeURIComponent('The end time has already passed. Pick a time later today.'));
+  const ends_at = endsIso && !Number.isNaN(endsT) ? endsIso : new Date(Date.now() + 5 * 3600e3).toISOString();
 
   const { data: ev, error } = await supabase
     .from('events')

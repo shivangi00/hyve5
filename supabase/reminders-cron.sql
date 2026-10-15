@@ -15,7 +15,7 @@ select cron.schedule(
   '*/10 * * * *',
   $$
   select net.http_get(
-    url := 'https://hyve5.vercel.app/api/cron/reminders',
+    url := 'https://YOUR-APP-URL/api/cron/reminders',
     headers := jsonb_build_object('Authorization', 'Bearer YOUR-CRON-SECRET')
   );
   $$

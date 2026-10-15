@@ -235,3 +235,8 @@ img { display: block; max-width: 100%; }
 .brand-bee { position: absolute; right: -2px; top: -7px; font-size: 12px; letter-spacing: 0; }
 .brand-tagline { font-size: 12px; color: var(--ink-2); letter-spacing: 0; font-weight: 400; }
 .brand-tagline em { font-style: italic; }
+
+/* ── Sign-in tags ───────────────────────────────────── */
+.tag-chip { margin-left: 4px; height: 22px; padding: 0 8px; border-radius: 11px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; background: var(--accent); color: var(--on-light); }
+.tag-chip.ghost { background: rgba(255, 200, 61, 0.16); color: var(--accent); border: 1px solid rgba(255, 200, 61, 0.4); }
+.g-mark { width: 22px; height: 22px; border-radius: 6px; background: var(--on-light); color: var(--ink); font-size: 12px; font-weight: 700; display: grid; place-items: center; }

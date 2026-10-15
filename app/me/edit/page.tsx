@@ -2,14 +2,29 @@ import Link from 'next/link';
 import { requireProfile } from '@/lib/session';
 import { Back } from '@/components/Icons';
 import { APP_TZ, STATUS, fmtDayDate, fmtTime } from '@/lib/util';
-import { addSlot, deleteSlot, saveProfile, signOut } from './actions';
+import { addSlot, chooseIdentity, deleteSlot, saveProfile, signOut } from './actions';
+import { ConnectAccount } from './ConnectAccount';
+import { Avatar } from '@/components/Avatar';
 import { SlotInput } from './SlotInput';
 import type { Slot, Status } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditPage() {
-  const { supabase, profile } = await requireProfile('/me/edit');
+const PROVIDERS = [
+  { id: 'linkedin_oidc' as const, label: 'LinkedIn' },
+  { id: 'google' as const, label: 'Google' },
+];
+
+export default async function EditPage({ searchParams }: { searchParams: Promise<{ slot?: string; source?: string }> }) {
+  const sp = await searchParams;
+  const { supabase, user, profile } = await requireProfile('/me/edit');
+  const accounts = PROVIDERS.map((p) => {
+    const identity = user.identities?.find((i) => i.provider === p.id);
+    const d = (identity?.identity_data ?? {}) as Record<string, string | undefined>;
+    const name = d.full_name || d.name || [d.given_name, d.family_name].filter(Boolean).join(' ') || null;
+    const photo = d.avatar_url || d.picture || null;
+    return { ...p, connected: !!identity, name, photo, email: d.email ?? null, photoInUse: !!photo && photo === profile.avatar_url, nameInUse: !!name && name === profile.full_name };
+  });
   const { data } = await supabase
     .from('slots')
     .select('*')
@@ -51,8 +66,11 @@ export default async function EditPage() {
       <section id="times" className="glass sheet" style={{ gap: 12 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 17, fontWeight: 600 }}>Bookable times</h2>
-          <p className="hint" style={{ margin: '4px 0 0' }}>The next three open times show on your card as 15-minute calls.</p>
+          <p className="hint" style={{ margin: '4px 0 0' }}>The next three open times show on your card as 15-minute calls. Only future times can be added.</p>
         </div>
+        {sp.slot === 'past' && <p className="error" role="alert" style={{ margin: 0 }}>That time has already passed, so it wasn't added. Pick a future time.</p>}
+        {sp.slot === 'invalid' && <p className="error" role="alert" style={{ margin: 0 }}>Choose a date and time first.</p>}
+        {sp.slot === 'added' && <p className="hint" role="status" style={{ margin: 0, color: '#9FF0BC' }}>Time added.</p>}
         {slots.length === 0 && <p className="muted" style={{ margin: 0, fontSize: 13.5 }}>No upcoming times.</p>}
         {slots.map((s) => (
           <form key={s.id} action={deleteSlot} className="list-row" style={{ justifyContent: 'space-between' }}>
@@ -68,6 +86,38 @@ export default async function EditPage() {
           <SlotInput />
           <button className="btn btn-ghost btn-block">Add time</button>
         </form>
+      </section>
+
+      <section id="accounts" className="glass sheet" style={{ gap: 12 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 17, fontWeight: 600 }}>Sign-in accounts</h2>
+          <p className="hint" style={{ margin: '4px 0 0' }}>Choose where your card's name and photo come from. Signing in again never overwrites them.</p>
+        </div>
+        {sp.source === 'updated' && <p className="hint" role="status" style={{ margin: 0, color: '#9FF0BC' }}>Card updated.</p>}
+        {accounts.map((a) => (
+          <div key={a.id} className="list-row" style={{ alignItems: 'flex-start', flexDirection: 'column', gap: 10 }}>
+            <div className="row" style={{ gap: 12, width: '100%' }}>
+              {a.connected ? <Avatar name={a.name || a.label} url={a.photo} size={42} /> : <span className="round" style={{ width: 42, height: 42, borderRadius: 14, fontWeight: 700 }}>{a.id === 'google' ? 'G' : 'in'}</span>}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 600 }}>{a.label}</div>
+                <div className="muted" style={{ fontSize: 12.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {a.connected ? [a.name, a.email].filter(Boolean).join(' · ') : 'Not connected'}
+                </div>
+              </div>
+              {(a.photoInUse || a.nameInUse) && <span className="pill" style={{ height: 24, fontSize: 11 }}>In use</span>}
+            </div>
+            {a.connected ? (
+              <form action={chooseIdentity} className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+                <input type="hidden" name="provider" value={a.id} />
+                <button className="btn btn-ghost btn-sm" name="take_both" value="1">Use name + photo</button>
+                {a.photo && <button className="btn btn-ghost btn-sm" name="take_photo" value="1">Photo only</button>}
+                {a.name && <button className="btn btn-ghost btn-sm" name="take_name" value="1">Name only</button>}
+              </form>
+            ) : (
+              <ConnectAccount provider={a.id} label={a.label} />
+            )}
+          </div>
+        ))}
       </section>
 
       <form action={signOut} style={{ textAlign: 'center' }}>

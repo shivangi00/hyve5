@@ -20,7 +20,16 @@ export function EndTimeInput() {
   return (
     <div className="field">
       <label className="label" htmlFor="ends_local">Ends at</label>
-      <input id="ends_local" type="datetime-local" className="input" value={local} onChange={(e) => setLocal(e.target.value)} />
+      <input
+        id="ends_local"
+        type="datetime-local"
+        className="input"
+        value={local}
+        onChange={(e) => setLocal(e.target.value)}
+      />
+      {local && !Number.isNaN(t) && t <= Date.now() && (
+        <p className="error" role="alert" style={{ margin: 0 }}>That time has already passed. Pick when the event ends.</p>
+      )}
       <input type="hidden" name="ends_at_iso" value={iso} />
     </div>
   );
