@@ -15,7 +15,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
 
   const { data: host } = await supabase.from('profiles').select('id').eq('slug', slug).maybeSingle();
   const { count: before } = host
-    ? await supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', user.id).eq('contact_id', host.id)
+    ? await supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', user.id).eq('contact_id', host.id).is('deleted_at', null)
     : { count: 0 };
 
   const { error } = await supabase.rpc('swap_cards', { host_slug: slug });

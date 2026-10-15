@@ -5,6 +5,7 @@ import { useFormStatus } from 'react-dom';
 import { finishOnboarding } from './actions';
 import { Avatar } from '@/components/Avatar';
 import { Check } from '@/components/Icons';
+import { LinkedInField } from '@/components/LinkedInField';
 import { STATUS } from '@/lib/util';
 import type { Status } from '@/lib/types';
 
@@ -35,6 +36,8 @@ export function OnboardingForm(props: {
   guessed: boolean;
   status: Status;
   topics: string;
+  linkedin: string | null;
+  viaLinkedIn: boolean;
 }) {
   const [status, setStatus] = useState<Status>(props.status);
   const slots = useMemo(() => JSON.stringify(defaultSlots()), []);
@@ -56,6 +59,8 @@ function Body(props: {
   guess: string;
   guessed: boolean;
   topics: string;
+  linkedin: string | null;
+  viaLinkedIn: boolean;
   status: Status;
   setStatus: (s: Status) => void;
 }) {
@@ -124,6 +129,8 @@ function Body(props: {
           <input id="topics" name="topics" className="input" defaultValue={props.topics} placeholder="e.g. Fintech, hiring, design systems" />
           <span className="hint">Leave it blank and we'll suggest a few.</span>
         </div>
+
+        <LinkedInField value={props.linkedin} signedInWithLinkedIn={props.viaLinkedIn} />
       </section>
       <div className="bottom">
         <button className="btn btn-primary btn-block" type="submit">Make my card</button>

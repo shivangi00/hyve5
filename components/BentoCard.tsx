@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import type { EventRow, Profile, Slot } from '@/lib/types';
-import { APP_TZ, fmtDay, fmtTime, isLive } from '@/lib/util';
+import { APP_TZ, fmtDay, fmtEventWhen, fmtTime, isLive, isUpcoming } from '@/lib/util';
 import { Avatar } from './Avatar';
 import { StatusPill } from './StatusPill';
-import { Globe, Mail, Plus } from './Icons';
+import { Plus } from './Icons';
+import { LinksOrbit } from './LinksOrbit';
+import { cardLinks } from '@/lib/links';
 import { BookingTile } from './BookingTile';
 
 type Props = {
@@ -13,10 +15,15 @@ type Props = {
   slots: Slot[];
   mode: 'owner' | 'public';
   viewer?: { name: string; email: string } | null;
+  /** The card owner's email. Shown to the owner and to people they've swapped with. */
+  email?: string | null;
+  /** Public card only: has the viewer already swapped with this person? */
+  swapped?: boolean;
 };
 
-export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer }: Props) {
+export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer, email, swapped }: Props) {
   const live = isLive(event);
+  const upcoming = !live && isUpcoming(event);
   const openSlots = slots
     .filter((s) => !s.booked_at && new Date(s.starts_at).getTime() > Date.now())
     .slice(0, 3)
@@ -40,25 +47,29 @@ export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer
       )}
 
       {/* Event tile */}
-      {live && event ? (
+      {(live || upcoming) && event ? (
         <div className="tile stack" style={{ justifyContent: 'space-between', minHeight: 150 }}>
           <div className="label row" style={{ gap: 7 }}>
-            <span className="live-dot" />
-            Attending now
+            {live && <span className="live-dot" />}
+            {live ? 'Attending now' : 'Attending'}
           </div>
           <div>
             <div style={{ fontSize: 19, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.15 }}>{event.name}</div>
-            <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>
-              {event.ends_at ? `Today · until ${fmtTime(event.ends_at, APP_TZ)}` : event.venue || 'Today'}
+            <div className="muted" style={{ fontSize: 12.5, marginTop: 4, lineHeight: 1.35 }}>
+              {fmtEventWhen(event, APP_TZ)}
+              {event.venue && <><br />{event.venue}</>}
             </div>
           </div>
           {mode === 'owner' ? (
             <div className="row" style={{ justifyContent: 'space-between', fontSize: 12, color: 'var(--ink-2)' }}>
-              <span>{swappedHere} swapped</span>
-              <Link href="/events/new" style={{ fontSize: 12 }}>Change</Link>
+              <span>{live ? `${swappedHere} swapped` : 'Coming up'}</span>
+              <span className="row" style={{ gap: 10 }}>
+                {event.organised && event.created_by === profile.id && <Link href={`/e/${event.slug}`} style={{ fontSize: 12 }}>Check-in QR</Link>}
+                <Link href="/events/new" style={{ fontSize: 12 }}>Change</Link>
+              </span>
             </div>
           ) : (
-            <div style={{ fontSize: 12, color: 'var(--ink-2)' }}>Swap to be tagged here too</div>
+            <div style={{ fontSize: 12, color: 'var(--ink-2)' }}>{live ? 'Swap to join the same stack' : 'See you there'}</div>
           )}
         </div>
       ) : mode === 'owner' ? (
@@ -74,17 +85,19 @@ export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer
         </div>
       )}
 
-      {/* Socials orbit */}
-      <div className="tile orbit">
-        <svg className="lines" viewBox="0 0 160 150" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <path d="M80 75 Q 55 60 44 40 M80 75 Q 105 60 116 40 M80 75 Q 55 90 44 110 M80 75 Q 105 90 116 110" stroke="rgba(255,255,255,.14)" strokeWidth="1" fill="none" />
-        </svg>
-        <span className="orb"><Plus /></span>
-        <Sat cls="tl" href={profile.linkedin_url} label="LinkedIn">in</Sat>
-        <Sat cls="tr" href={profile.x_url} label="X">X</Sat>
-        <Sat cls="bl" href="#book" label="Book a call"><Mail /></Sat>
-        <Sat cls="br" href={profile.website_url} label="Website"><Globe /></Sat>
-      </div>
+      {/* Links circle: centre button adds links (owner) or opens the full list (visitors) */}
+      {(() => {
+        const { linked, empty } = cardLinks(profile, email ?? null);
+        return (
+          <LinksOrbit
+            mode={mode}
+            linked={linked}
+            empty={empty}
+            name={profile.full_name}
+            vcardHref={mode === 'public' && swapped ? `/c/${profile.slug}/vcard` : null}
+          />
+        );
+      })()}
 
       {/* Booking */}
       <div id="book" className="tile span-2 stack" style={{ gap: 10 }}>
@@ -121,12 +134,3 @@ export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer
   );
 }
 
-function Sat({ cls, href, label, children }: { cls: string; href: string | null; label: string; children: React.ReactNode }) {
-  if (!href) return <span className={`sat ${cls} off`} aria-hidden="true">{children}</span>;
-  const external = href.startsWith('http');
-  return (
-    <a className={`sat ${cls}`} href={href} aria-label={label} {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}>
-      {children}
-    </a>
-  );
-}

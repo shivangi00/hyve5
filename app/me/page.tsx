@@ -13,7 +13,7 @@ import type { EventRow, Slot } from '@/lib/types';
 export const dynamic = 'force-dynamic';
 
 export default async function MePage() {
-  const { supabase, profile } = await requireProfile('/me');
+  const { supabase, user, profile } = await requireProfile('/me');
 
   let event: EventRow | null = null;
   if (profile.active_event_id) {
@@ -21,13 +21,15 @@ export default async function MePage() {
     event = (data as EventRow) ?? null;
   }
 
-  const [{ data: slots }, { count: pending }, swappedHere] = await Promise.all([
+  const [{ data: slots }, { count: pending }, swappedHere, { data: priv }] = await Promise.all([
     supabase.from('slots').select('*').eq('owner_id', profile.id).gte('starts_at', new Date().toISOString()).order('starts_at'),
-    supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', profile.id).eq('decision', 'pending'),
+    supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', profile.id).is('deleted_at', null).eq('decision', 'pending'),
     event
-      ? supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', profile.id).eq('event_id', event.id).then((r) => r.count ?? 0)
+      ? supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', profile.id).is('deleted_at', null).eq('event_id', event.id).then((r) => r.count ?? 0)
       : Promise.resolve(0),
+    supabase.from('profile_private').select('email').eq('id', profile.id).maybeSingle(),
   ]);
+  const email = (priv as { email: string | null } | null)?.email ?? user.email ?? null;
 
   const cardUrl = `${siteUrl()}/c/${profile.slug}`;
   const svg = await qrSvg(cardUrl);
@@ -52,7 +54,7 @@ export default async function MePage() {
         cardUrl={cardUrl}
         eventName={live && event ? event.name : null}
         below={<PushPrompt />}
-        card={<BentoCard profile={profile} event={event} swappedHere={swappedHere} slots={(slots as Slot[]) ?? []} mode="owner" />}
+        card={<BentoCard profile={profile} event={event} swappedHere={swappedHere} slots={(slots as Slot[]) ?? []} mode="owner" email={email} />}
       />
     </main>
   );

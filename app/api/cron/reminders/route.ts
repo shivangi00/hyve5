@@ -16,6 +16,11 @@ export async function GET(request: Request) {
   }
 
   const admin = createAdminClient();
+
+  // Contacts deleted more than 30 days ago are removed for good (their reminders go with them).
+  const purgeBefore = new Date(Date.now() - 30 * 86400e3).toISOString();
+  const { count: purged } = await admin.from('swaps').delete({ count: 'exact' }).lt('deleted_at', purgeBefore);
+
   const { data: due, error } = await admin
     .from('reminders')
     .select('id, kind, swap_id, owner_id')
@@ -28,10 +33,11 @@ export async function GET(request: Request) {
   let sent = 0;
   let skipped = 0;
   for (const r of due ?? []) {
-    const { data: swap } = await admin.from('swaps').select('contact_id, event_id, decision, stage').eq('id', r.swap_id).single();
+    const { data: swap } = await admin.from('swaps').select('contact_id, event_id, decision, stage, deleted_at').eq('id', r.swap_id).single();
     const stillRelevant =
       swap &&
       swap.decision !== 'skip' &&
+      !swap.deleted_at &&
       ((r.kind === 'message_3h' && swap.stage === 'met') || (r.kind !== 'message_3h' && (swap.stage === 'met' || swap.stage === 'messaged')));
 
     if (!stillRelevant) {
@@ -61,5 +67,5 @@ export async function GET(request: Request) {
     sent++;
   }
 
-  return NextResponse.json({ checked: due?.length ?? 0, sent, skipped });
+  return NextResponse.json({ checked: due?.length ?? 0, sent, skipped, purged: purged ?? 0 });
 }

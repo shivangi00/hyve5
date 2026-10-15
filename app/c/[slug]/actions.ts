@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { esc, sendEmail } from '@/lib/email';
@@ -59,4 +60,18 @@ export async function saveSwapNote(swapId: string, note: string) {
   const supabase = await createClient();
   await supabase.from('swaps').update({ note: note.trim().slice(0, 500) || null }).eq('id', swapId);
   return { ok: true };
+}
+
+/** After a swap: "Are you at the same event as them?" */
+export async function answerSameEvent(formData: FormData) {
+  const slug = String(formData.get('slug') || '');
+  const yes = formData.get('answer') === 'yes';
+  if (yes) {
+    const supabase = await createClient();
+    const { error } = await supabase.rpc('join_swap_event', { host_slug: slug });
+    if (error) console.error('join_swap_event failed', error);
+    revalidatePath('/ride-home');
+    revalidatePath('/me');
+  }
+  redirect(`/c/${slug}?swapped=1&ev=${yes ? 'yes' : 'no'}`);
 }

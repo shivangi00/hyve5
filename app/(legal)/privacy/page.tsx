@@ -37,7 +37,7 @@ export default function PrivacyPage() {
 
       <h2>Where it's stored</h2>
       <p>
-        Data is stored with Supabase (database and sign-in) and the app is hosted on Vercel. Optional reminder emails are sent through Resend. These providers process data on our behalf.
+        Data is stored with Supabase (database and sign-in) and the app is hosted on Vercel. Optional reminder emails are sent through Resend. These providers process data on our behalf. Small icons for links on cards are loaded from DuckDuckGo's icon service, which sees only the link's web address (for example, yoursite.com).
       </p>
 
       <h2>Use of Google user data</h2>
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
 
       <h2>Deleting your data</h2>
       <p>
-        Email <a href={`mailto:${email}`}>{email}</a> from the address you signed in with and we'll delete your account, card, swaps and notes within 30 days. You can turn off notifications at any time in your phone or browser settings.
+        You can delete your account yourself at any time: open your card, tap Edit card, scroll to Delete account and type delete to confirm. This removes your card, contacts, notes, bookable times, reminders and sign-in straight away, and removes you from other people's contacts. Contacts you delete are kept for 30 days so you can restore them, then removed for good. If you can't sign in, email <a href={`mailto:${email}`}>{email}</a> from the address you signed in with and we'll delete everything within 30 days. You can turn off notifications at any time in your phone or browser settings.
       </p>
 
       <h2>Contact</h2>

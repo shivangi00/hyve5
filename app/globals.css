@@ -158,8 +158,6 @@ img { display: block; max-width: 100%; }
   font-weight: 700; font-size: 13px; color: rgba(243, 241, 234, 0.9);
 }
 .sat.off { opacity: 0.35; }
-.sat.tl { left: 14%; top: 12%; } .sat.tr { right: 14%; top: 12%; }
-.sat.bl { left: 14%; bottom: 12%; } .sat.br { right: 14%; bottom: 12%; }
 
 /* ── Slots ──────────────────────────────────────────── */
 .slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -240,3 +238,84 @@ img { display: block; max-width: 100%; }
 .tag-chip { margin-left: 4px; height: 22px; padding: 0 8px; border-radius: 11px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; background: var(--accent); color: var(--on-light); }
 .tag-chip.ghost { background: rgba(255, 200, 61, 0.16); color: var(--accent); border: 1px solid rgba(255, 200, 61, 0.4); }
 .g-mark { width: 22px; height: 22px; border-radius: 6px; background: var(--on-light); color: var(--ink); font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+
+
+/* ── Contacts ───────────────────────────────────────── */
+.seg-link { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 11px; color: var(--ink-2); font-size: 12.5px; font-weight: 500; text-decoration: none; white-space: nowrap; }
+.seg-link.on { background: var(--ink); color: var(--on-light); }
+.seg-count { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: rgba(255, 200, 61, 0.2); color: var(--accent); font-size: 10.5px; font-weight: 700; display: inline-grid; place-items: center; }
+.seg-link.on .seg-count { background: var(--on-light); color: var(--accent); }
+.contact-row { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 20px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+.contact-actions { gap: 6px; flex-wrap: wrap; }
+.contact-actions .btn-sm { height: 36px; padding: 0 12px; font-size: 12.5px; }
+.link-btn.danger { color: #ffb3a3; min-height: 36px; }
+
+.btn-danger { background: rgba(255, 120, 96, .14); color: #ffb3a3; border: 1px solid rgba(255, 140, 120, .35); }
+.btn-danger:hover { background: rgba(255, 120, 96, .22); }
+
+/* ── Instant feedback ── */
+.spinner {
+  display: inline-block; width: 14px; height: 14px; flex: none;
+  border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent;
+  animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 8px; opacity: .85;
+}
+.spinner.lg { width: 26px; height: 26px; border-width: 3px; margin: 0; color: var(--accent); }
+@keyframes spin { to { transform: rotate(360deg); } }
+button:disabled, [aria-disabled="true"] { cursor: progress; }
+button[aria-busy="true"], a[aria-busy="true"] { opacity: .8; }
+.page-loading {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  font-size: 14px; color: rgba(243, 241, 234, .85); min-height: 60vh;
+}
+/* A contact being moved or deleted fades out straight away. */
+.contact-row:has([aria-busy="true"]), .list-row:has([aria-busy="true"]) { opacity: .5; pointer-events: none; transition: opacity .15s; }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
+.btn .spinner { margin-right: 0; }
+.orb { color: inherit; text-decoration: none; cursor: pointer; z-index: 1; transition: transform .12s; }
+.orb:active { transform: translate(-50%, -50%) scale(.92); }
+.orb-label {
+  position: absolute; left: 50%; top: calc(50% + 28px); transform: translateX(-50%);
+  font-size: 10.5px; color: var(--ink-2); white-space: nowrap; pointer-events: none;
+}
+
+/* ── Links circle ── */
+.orbit { min-height: 168px; }
+.orbit .sat { transform: translate(-50%, -50%); width: 34px; height: 34px; border-radius: 17px; padding: 0; cursor: pointer; transition: transform .12s, background .12s; }
+.orbit .sat:active { transform: translate(-50%, -50%) scale(.9); }
+.orbit .sat:not(.off):hover { background: rgba(255, 200, 61, .14); border-color: rgba(255, 200, 61, .45); }
+.sat.off { opacity: .32; border-style: dashed; }
+.sat.static { position: static; transform: none; flex: none; }
+button.sat { font: inherit; color: rgba(243, 241, 234, .9); }
+.mark { font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.mark.len-1 { font-size: 14px; } .mark.len-2 { font-size: 12.5px; } .mark.len-3 { font-size: 10.5px; }
+.orb { z-index: 2; color: var(--ink); }
+.orb-label { z-index: 2; top: calc(50% + 26px); font-size: 10px; background: rgba(18, 18, 20, .7); padding: 1px 6px; border-radius: 8px; }
+
+/* ── Links sheet ── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  display: flex; align-items: flex-end; justify-content: center; padding: 12px; animation: fade .15s ease;
+}
+.modal-sheet { width: 100%; max-width: 440px; max-height: 86vh; overflow-y: auto; gap: 14px; animation: slideup .2s cubic-bezier(.2, .8, .2, 1); }
+@media (min-width: 640px) { .modal-backdrop { align-items: center; } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes slideup { from { transform: translateY(24px); opacity: 0; } }
+.link-input { display: flex; align-items: center; gap: 10px; }
+.link-input .input { flex: 1; min-width: 0; }
+.link-row {
+  display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-radius: 16px; width: 100%;
+  background: none; border: none; color: inherit; font: inherit; text-align: left;
+}
+.link-row:hover { background: rgba(255, 255, 255, .04); }
+button.link-row { cursor: pointer; }
+.link-row.off { color: var(--ink-2); }
+.hint.ok { color: #9ff0bc; }
+.orb.hub { cursor: default; width: 22px; height: 22px; border-radius: 11px; box-shadow: 0 0 0 5px rgba(255, 255, 255, .04), 0 0 18px rgba(255, 200, 61, .25); }
+.orb.hub:active { transform: translate(-50%, -50%); }
+.orb { padding: 0; font: inherit; }
+.choice:has(input:checked) { background: var(--ink); color: var(--on-light); border-color: var(--ink); }
+.choice:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.choice { cursor: pointer; }
+.favicon { border-radius: 4px; display: block; }
+/* Site icons sit on a light chip so dark logos (GitHub, X…) stay visible on the dark card. */
+.favicon { background: #f3f1ea; padding: 3px; border-radius: 7px; box-sizing: content-box; }

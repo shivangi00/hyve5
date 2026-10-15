@@ -14,15 +14,23 @@ export async function createEvent(formData: FormData) {
 
   const name = String(formData.get('name') || '').trim().slice(0, 80);
   if (!name) redirect('/events/new');
+  const organised = formData.get('role') === 'organising';
   const venue = String(formData.get('venue') || '').trim().slice(0, 80) || null;
+  const startsIso = String(formData.get('starts_at_iso') || '');
   const endsIso = String(formData.get('ends_at_iso') || '');
+  const startsT = Date.parse(startsIso);
   const endsT = Date.parse(endsIso);
-  if (endsIso && !Number.isNaN(endsT) && endsT <= Date.now()) redirect('/events/new?error=' + encodeURIComponent('The end time has already passed. Pick a time later today.'));
-  const ends_at = endsIso && !Number.isNaN(endsT) ? endsIso : new Date(Date.now() + 5 * 3600e3).toISOString();
+  const fail = (m: string) => redirect('/events/new?error=' + encodeURIComponent(m));
+  if (Number.isNaN(startsT) || Number.isNaN(endsT)) fail('Pick a date, a start time and an end time.');
+  if (endsT <= startsT) fail('The end time needs to be after the start time.');
+  if (endsT <= Date.now()) fail('That event has already finished. Pick a later end time.');
+  if (startsT > Date.now() + 366 * 86400e3) fail('Pick a date within the next year.');
+  const starts_at = new Date(startsT).toISOString();
+  const ends_at = new Date(endsT).toISOString();
 
   const { data: ev, error } = await supabase
     .from('events')
-    .insert({ slug: slugify(name), name, venue, ends_at, created_by: user!.id })
+    .insert({ slug: slugify(name), name, venue, starts_at, ends_at, organised, created_by: user!.id })
     .select('id')
     .single();
   if (error || !ev) redirect(`/events/new?error=${encodeURIComponent(error?.message ?? 'Could not save')}`);

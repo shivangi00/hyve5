@@ -5,6 +5,7 @@ import { qrSvg } from '@/lib/qr';
 import { APP_TZ, fmtTime, isLive, siteUrl } from '@/lib/util';
 import { BrandMark } from '@/components/BrandMark';
 import type { EventRow } from '@/lib/types';
+import { PendingLink } from '@/components/PendingLink';
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -13,7 +14,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const event = data as EventRow | null;
   if (!event) notFound();
 
-  const isHost = user?.id === event.created_by;
+  const isHost = user?.id === event.created_by && !!event.organised;
   const live = isLive(event);
   const svg = isHost ? await qrSvg(`${siteUrl()}/e/${event.slug}`) : null;
 
@@ -40,7 +41,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
           <p style={{ margin: 0, fontSize: 15, lineHeight: 1.45 }}>
             Check in to get your own bento card. Everyone you swap with tonight is saved to a follow-up stack for the ride home.
           </p>
-          <a href={`/e/${event.slug}/checkin`} className="btn btn-primary btn-block">Check in</a>
+          <PendingLink href={`/e/${event.slug}/checkin`} className="btn btn-primary btn-block" pendingText="Checking in…">Check in</PendingLink>
         </section>
       </div>
     </main>

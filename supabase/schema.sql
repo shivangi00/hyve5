@@ -24,6 +24,7 @@ create table public.events (
   starts_at   timestamptz default now(),
   ends_at     timestamptz,
   created_by  uuid,
+  organised   boolean not null default false,   -- true = the creator runs it (gets the check-in QR)
   created_at  timestamptz default now()
 );
 
@@ -41,6 +42,7 @@ create table public.profiles (
   linkedin_url     text,
   x_url            text,
   website_url      text,
+  links            text[] not null default '{}',   -- any other links: GitHub, Behance, Substack, Instagram…
   active_event_id  uuid references public.events(id) on delete set null,
   onboarded        boolean not null default false,
   is_demo          boolean not null default false,
@@ -65,6 +67,7 @@ create table public.swaps (
   met_at       timestamptz not null default now(),
   messaged_at  timestamptz,
   booked_at    timestamptz,
+  deleted_at   timestamptz,               -- set when deleted; restorable for 30 days, then purged
   unique (owner_id, contact_id)
 );
 
@@ -151,6 +154,7 @@ create policy "email update own"    on public.profile_private for update using (
 
 create policy "my swaps"            on public.swaps for select using (owner_id = auth.uid());
 create policy "update my swaps"     on public.swaps for update using (owner_id = auth.uid());
+create policy "delete my swaps"     on public.swaps for delete using (owner_id = auth.uid());
 
 create policy "slots readable"      on public.slots for select using (true);
 create policy "slots insert own"    on public.slots for insert with check (owner_id = auth.uid());
@@ -190,23 +194,29 @@ begin
   if host.id is null then raise exception 'card not found'; end if;
   if host.id = me then return null; end if;
 
+  -- Tag the swap to the host's event only if it's happening right now AND the guest has
+  -- already said they're attending it (checked in, or answered yes before). Otherwise the
+  -- app asks the guest "Are you at the same event?" and calls join_swap_event on yes.
   select e.id into ev from public.events e
-   where e.id = host.active_event_id and (e.ends_at is null or e.ends_at > now() - interval '6 hours');
-
-  if ev is not null then
-    update public.profiles set active_event_id = ev where id = me;
-  end if;
+   where e.id = host.active_event_id
+     and (e.starts_at is null or e.starts_at <= now() + interval '30 minutes')
+     and (e.ends_at   is null or e.ends_at   >= now() - interval '30 minutes')
+     and exists (select 1 from public.profiles g where g.id = me and g.active_event_id = e.id);
 
   insert into public.swaps (owner_id, contact_id, event_id)
   values (me, host.id, ev)
   on conflict (owner_id, contact_id) do update
-    set event_id = coalesce(excluded.event_id, public.swaps.event_id), met_at = now()
+    set event_id = coalesce(excluded.event_id, public.swaps.event_id), met_at = now(),
+        decision = case when public.swaps.deleted_at is not null then 'pending' else public.swaps.decision end,
+        deleted_at = null
   returning id into my_swap;
 
   insert into public.swaps (owner_id, contact_id, event_id)
   values (host.id, me, ev)
   on conflict (owner_id, contact_id) do update
-    set event_id = coalesce(excluded.event_id, public.swaps.event_id), met_at = now()
+    set event_id = coalesce(excluded.event_id, public.swaps.event_id), met_at = now(),
+        decision = case when public.swaps.deleted_at is not null then 'pending' else public.swaps.decision end,
+        deleted_at = null
   returning id into host_swap;
 
   insert into public.reminders (swap_id, owner_id, kind, due_at) values
@@ -216,9 +226,41 @@ begin
     (host_swap, host.id, 'message_3h',  now() + interval '3 hours'),
     (host_swap, host.id, 'followup_d3', now() + interval '3 days'),
     (host_swap, host.id, 'lastcall_d7', now() + interval '7 days')
-  on conflict (swap_id, kind) do nothing;
+  on conflict (swap_id, kind) do update
+    set due_at = excluded.due_at, sent_at = null, cleared_at = null;  -- meeting again restarts the reminders
 
   return my_swap;
+end;
+$$;
+
+-- ───────────────────────── join_swap_event(host_slug) ─────────────────────────
+-- The guest said "yes, I'm at the same event": tag both swaps to the host's event
+-- and mark the guest as attending it. Only works while the event is on.
+create or replace function public.join_swap_event(host_slug text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  me   uuid := auth.uid();
+  host public.profiles;
+  ev   uuid;
+begin
+  if me is null then raise exception 'not signed in'; end if;
+  select * into host from public.profiles where slug = host_slug;
+  if host.id is null or host.id = me then return null; end if;
+
+  select e.id into ev from public.events e
+   where e.id = host.active_event_id
+     and (e.starts_at is null or e.starts_at <= now() + interval '30 minutes')
+     and (e.ends_at   is null or e.ends_at   >= now() - interval '30 minutes');
+  if ev is null then return null; end if;
+
+  update public.swaps set event_id = ev
+   where (owner_id = me and contact_id = host.id) or (owner_id = host.id and contact_id = me);
+  update public.profiles set active_event_id = ev where id = me;
+  return ev;
 end;
 $$;
 
@@ -256,4 +298,5 @@ end;
 $$;
 
 grant execute on function public.swap_cards(text) to authenticated;
+grant execute on function public.join_swap_event(text) to authenticated;
 grant execute on function public.book_slot(uuid, text, text) to anon, authenticated;

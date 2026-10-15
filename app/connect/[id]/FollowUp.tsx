@@ -34,6 +34,7 @@ export function FollowUp(props: {
   const [toast, setToast] = useState<string | null>(null);
   const [reminders, setReminders] = useState(props.reminders);
   const [, start] = useTransition();
+  const [testing, setTesting] = useState(false);
   const si = ORDER.indexOf(stage);
 
   const full = withLink ? `${text}\n\nPick a time that suits you: ${props.bookingUrl}` : text;
@@ -188,9 +189,17 @@ export function FollowUp(props: {
           <button
             className="link-btn"
             style={{ minHeight: 32, fontSize: 12.5 }}
-            onClick={() => start(async () => { const r = await sendTestReminder(props.swapId); flash(r.text); })}
+            disabled={testing}
+            onClick={() => {
+              setTesting(true);
+              start(async () => {
+                const r = await sendTestReminder(props.swapId);
+                setTesting(false);
+                flash(r.text);
+              });
+            }}
           >
-            <Bell size={13} /> Send me one now
+            {testing ? <><span className="spinner" aria-hidden="true" />Sending…</> : <><Bell size={13} /> Send me one now</>}
           </button>
         </div>
         {reminders.map((r) => (

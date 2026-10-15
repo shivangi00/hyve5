@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'hyve5',
   description: 'Swap bento cards at events, then follow up while it still counts.',
   appleWebApp: { capable: true, title: 'hyve5', statusBarStyle: 'black-translucent' },
-  icons: { apple: '/apple-touch-icon.png' },
+  icons: { icon: [{ url: '/favicon.ico', sizes: 'any' }, { url: '/icon.png', type: 'image/png' }], apple: '/apple-touch-icon.png' },
 };
 
 export const viewport: Viewport = {

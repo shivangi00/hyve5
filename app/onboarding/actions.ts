@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { generateCard } from '@/lib/ai';
-import { safeNext } from '@/lib/util';
+import { normaliseLinkedIn, safeNext } from '@/lib/util';
 import type { Status } from '@/lib/types';
 
 export async function finishOnboarding(formData: FormData) {
@@ -23,12 +23,14 @@ export async function finishOnboarding(formData: FormData) {
     .filter(Boolean)
     .slice(0, 4);
 
+  const linkedin = normaliseLinkedIn(String(formData.get('linkedin_url') || ''));
+
   const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user!.id).single();
   const card = await generateCard({ name: profile?.full_name ?? '', roleLine, status, topics });
 
   await supabase
     .from('profiles')
-    .update({ role_line: roleLine, status, headline: card.headline, topics: card.topics, onboarded: true })
+    .update({ role_line: roleLine, status, headline: card.headline, topics: card.topics, onboarded: true, ...(linkedin ? { linkedin_url: linkedin } : {}) })
     .eq('id', user!.id);
 
   // Give new cards three bookable times so the booking tile works from minute one.

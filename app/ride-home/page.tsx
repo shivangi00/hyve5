@@ -5,7 +5,7 @@ import { Avatar } from '@/components/Avatar';
 import { BellLink } from '@/components/BellLink';
 import { SwipeStack, type StackCard } from './SwipeStack';
 import { scoreMatch } from '@/lib/match';
-import { APP_TZ, STATUS, fmtTime, timeLeft } from '@/lib/util';
+import { APP_TZ, STATUS, fmtDayDate, fmtTime, timeLeft } from '@/lib/util';
 import type { EventRow, Profile, Swap } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +17,7 @@ export default async function RideHomePage() {
     .from('swaps')
     .select('*')
     .eq('owner_id', me.id)
+    .is('deleted_at', null)
     .neq('decision', 'skip')
     .order('met_at', { ascending: false });
   const swaps = (swapRows as Swap[]) ?? [];
@@ -26,7 +27,7 @@ export default async function RideHomePage() {
   const [{ data: people }, { data: events }, { count: skipped }] = await Promise.all([
     contactIds.length ? supabase.from('profiles').select('*').in('id', contactIds) : Promise.resolve({ data: [] }),
     eventIds.length ? supabase.from('events').select('*').in('id', eventIds) : Promise.resolve({ data: [] }),
-    supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', me.id).eq('decision', 'skip'),
+    supabase.from('swaps').select('id', { count: 'exact', head: true }).eq('owner_id', me.id).is('deleted_at', null).eq('decision', 'skip'),
   ]);
   const byId = new Map(((people ?? []) as Profile[]).map((p) => [p.id, p]));
   const evById = new Map(((events ?? []) as EventRow[]).map((e) => [e.id, e]));
@@ -45,7 +46,8 @@ export default async function RideHomePage() {
         statusColor: STATUS[c.status].color,
         note: s.note,
         metAt: fmtTime(s.met_at, APP_TZ),
-        eventName: s.event_id ? evById.get(s.event_id)?.name ?? null : null,
+        // Not tagged to an event: grouped under the day you met instead.
+        eventName: (s.event_id ? evById.get(s.event_id)?.name : null) ?? fmtDayDate(s.met_at, APP_TZ),
         why: m.why,
         strong: m.strong,
         score: m.score,
@@ -55,7 +57,7 @@ export default async function RideHomePage() {
     .sort((a, b) => b.score - a.score || b.metMs - a.metMs);
 
   const following = swaps.filter((s) => s.decision === 'connect' && s.stage !== 'done' && byId.has(s.contact_id));
-  const headerEvent = pending[0]?.eventName ?? (swaps[0]?.event_id ? evById.get(swaps[0].event_id)?.name : null) ?? 'Your swaps';
+  const headerEvent = pending[0]?.eventName ?? (swaps[0] ? (swaps[0].event_id ? evById.get(swaps[0].event_id)?.name : null) ?? fmtDayDate(swaps[0].met_at, APP_TZ) : null) ?? 'Your swaps';
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: APP_TZ }).toUpperCase().split(' ');
 
   return (
@@ -78,8 +80,8 @@ export default async function RideHomePage() {
           </div>
         </div>
         <div style={{ textAlign: 'right', fontSize: 11.5, lineHeight: 1.5 }}>
-          <div style={{ color: '#9FF0BC' }}>{following.length} to follow up</div>
-          <div className="muted">{skipped ?? 0} archived</div>
+          <Link href="/contacts?tab=connect" style={{ color: '#9FF0BC', textDecoration: 'none', display: 'block' }}>{following.length} to follow up</Link>
+          <Link href="/contacts?tab=later" className="muted" style={{ textDecoration: 'none' }}>{skipped ?? 0} later</Link>
         </div>
       </div>
 
@@ -123,6 +125,7 @@ export default async function RideHomePage() {
           })}
         </section>
       )}
+      <Link href="/contacts" className="btn btn-ghost btn-block">All contacts · edit, move or delete</Link>
     </main>
   );
 }

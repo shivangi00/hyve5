@@ -12,6 +12,7 @@ export type Profile = {
   linkedin_url: string | null;
   x_url: string | null;
   website_url: string | null;
+  links?: string[];
   active_event_id: string | null;
   onboarded: boolean;
   is_demo: boolean;
@@ -25,6 +26,7 @@ export type EventRow = {
   starts_at: string | null;
   ends_at: string | null;
   created_by: string | null;
+  organised?: boolean;
 };
 
 export type Slot = {
@@ -46,6 +48,7 @@ export type Swap = {
   met_at: string;
   messaged_at: string | null;
   booked_at: string | null;
+  deleted_at?: string | null;
 };
 
 export type Reminder = {

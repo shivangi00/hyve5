@@ -96,7 +96,7 @@ export function SwipeStack({ cards }: { cards: StackCard[] }) {
         <article
           key={top.swapId}
           className="deck-card"
-          aria-label={`${top.name}. Swipe right to follow up, left to archive.`}
+          aria-label={`${top.name}. Swipe right to follow up, left to save for later.`}
           style={{
             transform: `translateX(${dx}px) rotate(${rot}deg)`,
             transition: dragging ? 'none' : 'transform .26s cubic-bezier(.2,.8,.2,1)',
@@ -130,7 +130,7 @@ export function SwipeStack({ cards }: { cards: StackCard[] }) {
           }}
         >
           <span className="stamp yes" style={{ opacity: Math.max(0, Math.min(1, dx / THRESHOLD)) }}>CONNECT</span>
-          <span className="stamp no" style={{ opacity: Math.max(0, Math.min(1, -dx / THRESHOLD)) }}>SKIP</span>
+          <span className="stamp no" style={{ opacity: Math.max(0, Math.min(1, -dx / THRESHOLD)) }}>LATER</span>
 
           <div className="tile stack" style={{ padding: 18, alignItems: 'center', textAlign: 'center', gap: 8 }}>
             <Avatar name={top.name} url={top.avatar} size={84} />
@@ -164,7 +164,7 @@ export function SwipeStack({ cards }: { cards: StackCard[] }) {
       </div>
 
       <div className="row" style={{ justifyContent: 'center', gap: 18, paddingTop: 4 }}>
-        <button className="round md" aria-label="Skip: archive quietly" onClick={() => decide(-1)}>
+        <button className="round md" aria-label="Later: save without follow-up reminders" onClick={() => decide(-1)}>
           <Cross color="#FFB3A3" />
         </button>
         <Link href={`/connect/${top.swapId}`} className="round sm" aria-label={`Write to ${top.name} now`}>
@@ -175,7 +175,7 @@ export function SwipeStack({ cards }: { cards: StackCard[] }) {
         </button>
       </div>
       <div style={{ textAlign: 'center', fontSize: 11.5, color: 'rgba(243, 241, 234,.8)' }}>
-        Swipe right to follow up · left to archive quietly
+        Swipe right to follow up · left to save for later
         {last && idx > 0 && (
           <>
             {' · '}

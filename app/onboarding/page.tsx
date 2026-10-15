@@ -26,6 +26,8 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
         guessed={!!company && !profile!.role_line}
         status={profile!.status}
         topics={profile!.topics.join(', ')}
+        linkedin={profile!.linkedin_url}
+        viaLinkedIn={!!user!.identities?.some((i) => i.provider === 'linkedin_oidc')}
       />
     </main>
   );

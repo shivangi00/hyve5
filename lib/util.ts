@@ -50,9 +50,30 @@ export function companyFromEmail(email: string | null | undefined) {
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-export function isLive(ev: Pick<EventRow, 'ends_at'> | null | undefined) {
+/** Matches the database: an event counts as "on" from 30 minutes before it starts to 30 minutes after it ends. */
+const EVENT_GRACE = 30 * 60e3;
+
+export function isLive(ev: Pick<EventRow, 'starts_at' | 'ends_at'> | null | undefined) {
   if (!ev) return false;
-  return !ev.ends_at || new Date(ev.ends_at).getTime() > Date.now();
+  const now = Date.now();
+  const started = !ev.starts_at || new Date(ev.starts_at).getTime() - EVENT_GRACE <= now;
+  const notEnded = !ev.ends_at || new Date(ev.ends_at).getTime() + EVENT_GRACE >= now;
+  return started && notEnded;
+}
+
+/** Later today or on a future date, not started yet. */
+export function isUpcoming(ev: Pick<EventRow, 'starts_at' | 'ends_at'> | null | undefined) {
+  if (!ev?.starts_at) return false;
+  return new Date(ev.starts_at).getTime() - EVENT_GRACE > Date.now();
+}
+
+/** "Today · 18:00–21:00" or "Sat 18 Oct · 18:00–21:00" */
+export function fmtEventWhen(ev: Pick<EventRow, 'starts_at' | 'ends_at'>, tz?: string) {
+  const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { timeZone: tz });
+  const start = ev.starts_at ? new Date(ev.starts_at) : null;
+  const label = start ? (day(start.toISOString()) === day(new Date().toISOString()) ? 'Today' : fmtDayDate(start.toISOString(), tz)) : 'Today';
+  const range = [start ? fmtTime(start.toISOString(), tz) : null, ev.ends_at ? fmtTime(ev.ends_at, tz) : null].filter(Boolean).join('–');
+  return range ? `${label} · ${range}` : label;
 }
 
 export function fmtTime(iso: string, tz?: string) {
@@ -80,3 +101,18 @@ export function timeLeft(iso: string) {
 }
 
 export const APP_TZ = process.env.NEXT_PUBLIC_APP_TZ || 'Europe/London';
+
+/**
+ * Turns whatever someone pastes into a clean LinkedIn profile link.
+ * "linkedin.com/in/jane-doe", "https://uk.linkedin.com/in/jane-doe/?trk=x", "in/jane-doe", "jane-doe"
+ *   → "https://www.linkedin.com/in/jane-doe". Returns null for empty input.
+ */
+export function normaliseLinkedIn(input: string | null | undefined): string | null {
+  const raw = (input ?? '').trim();
+  if (!raw) return null;
+  const m = raw.match(/linkedin\.com\/(in|company)\/([^/?#\s]+)/i);
+  if (m) return `https://www.linkedin.com/${m[1]!.toLowerCase()}/${m[2]}`;
+  const short = raw.replace(/^@/, '').replace(/^\/?in\//i, '').replace(/\/+$/, '');
+  if (/^[a-z0-9-_%.]{3,100}$/i.test(short)) return `https://www.linkedin.com/in/${short}`;
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+}

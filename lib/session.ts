@@ -27,6 +27,8 @@ export async function ensureProfile(
   const avatar = meta.avatar_url || meta.picture || null;
   if (existing) {
     if (!existing.avatar_url && avatar) await supabase.from('profiles').update({ avatar_url: avatar }).eq('id', user.id);
+    // Older accounts may have no saved email yet; add it without replacing one the person chose.
+    if (user.email) await supabase.from('profile_private').upsert({ id: user.id, email: user.email }, { onConflict: 'id', ignoreDuplicates: true });
     return existing as Profile;
   }
   const fullName =

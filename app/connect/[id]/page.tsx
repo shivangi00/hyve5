@@ -8,6 +8,8 @@ import { FollowUp, type ReminderView } from './FollowUp';
 import { draftMessage } from '@/lib/ai';
 import { APP_TZ, fmtDayDate, fmtTime, firstName, siteUrl, timeLeft } from '@/lib/util';
 import type { EventRow, Profile, Reminder, Swap } from '@/lib/types';
+import { deleteContact } from '@/app/contacts/actions';
+import { SubmitButton } from '@/components/SubmitButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +23,7 @@ export default async function ConnectPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const { supabase, profile: me } = await requireProfile(`/connect/${id}`);
 
-  const { data: swapData } = await supabase.from('swaps').select('*').eq('id', id).eq('owner_id', me.id).maybeSingle();
+  const { data: swapData } = await supabase.from('swaps').select('*').eq('id', id).eq('owner_id', me.id).is('deleted_at', null).maybeSingle();
   const swap = swapData as Swap | null;
   if (!swap) notFound();
 
@@ -96,6 +98,10 @@ export default async function ConnectPage({ params }: { params: Promise<{ id: st
         deadlines={deadlines}
         reminders={reminders}
       />
+      <form action={deleteContact} style={{ textAlign: 'center' }}>
+        <input type="hidden" name="id" value={swap.id} />
+        <SubmitButton className="link-btn danger" pendingText="Deleting…">Delete this contact (restorable for 30 days)</SubmitButton>
+      </form>
     </main>
   );
 }
