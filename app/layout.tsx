@@ -6,9 +6,9 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
 
 export const metadata: Metadata = {
-  title: 'NetworkPulse',
+  title: 'hyve5',
   description: 'Swap bento cards at events, then follow up while it still counts.',
-  appleWebApp: { capable: true, title: 'NetworkPulse', statusBarStyle: 'black-translucent' },
+  appleWebApp: { capable: true, title: 'hyve5', statusBarStyle: 'black-translucent' },
   icons: { apple: '/apple-touch-icon.png' },
 };
 
@@ -16,7 +16,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#2a181d',
+  themeColor: '#141416',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

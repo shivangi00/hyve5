@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/session';
 import { safeNext } from '@/lib/util';
 import { LoginButtons } from './LoginButtons';
-import { Plus } from '@/components/Icons';
+import { BrandMark } from '@/components/BrandMark';
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const sp = await searchParams;
@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <main className="shell">
       <div className="topbar">
-        <span className="brand"><span className="brand-mark"><Plus size={14} /></span>NetworkPulse</span>
+        <span className="brand"><BrandMark /></span>
       </div>
       <div className="bottom">
         <section className="glass sheet rise">

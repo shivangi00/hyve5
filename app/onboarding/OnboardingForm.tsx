@@ -72,8 +72,8 @@ function Body(props: {
           <div style={{ gridColumn: 'span 2', animationDelay: '1.2s' }} />
         </div>
         <div role="status" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 18, fontWeight: 600, textShadow: '0 1px 12px rgba(40,10,30,.4)' }}>Building your card</div>
-          <div style={{ fontSize: 13, color: 'rgba(245,238,236,.85)', marginTop: 4 }}>Writing your headline and picking tiles</div>
+          <div style={{ fontSize: 18, fontWeight: 600, textShadow: '0 1px 12px rgba(0, 0, 0,.4)' }}>Building your card</div>
+          <div style={{ fontSize: 13, color: 'rgba(243, 241, 234,.85)', marginTop: 4 }}>Writing your headline and picking tiles</div>
         </div>
       </div>
     );

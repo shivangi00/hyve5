@@ -108,8 +108,8 @@ export function PushPrompt({ context = 'default', showWhenOn = false }: { contex
         </button>
       )}
       <div className="row" style={{ gap: 12, alignItems: 'flex-start', paddingRight: 30 }}>
-        <span className="round" style={{ width: 40, height: 40, borderRadius: 14, flex: 'none', background: 'rgba(255,122,89,.16)', border: '1px solid rgba(255,122,89,.4)' }}>
-          <Bell color="#FF9A80" />
+        <span className="round" style={{ width: 40, height: 40, borderRadius: 14, flex: 'none', background: 'rgba(255,200,61,.16)', border: '1px solid rgba(255,200,61,.4)' }}>
+          <Bell color="#FFD24D" />
         </span>
         <div>
           <div style={{ fontSize: 15.5, fontWeight: 600 }}>{lead}</div>
@@ -119,7 +119,7 @@ export function PushPrompt({ context = 'default', showWhenOn = false }: { contex
 
       {state === 'ask' && (
         <button className="btn btn-primary btn-block" onClick={turnOn} disabled={busy}>
-          <Bell color="#1d1114" /> {busy ? 'Turning on…' : 'Turn on notifications'}
+          <Bell color="#121214" /> {busy ? 'Turning on…' : 'Turn on notifications'}
         </button>
       )}
 
@@ -134,7 +134,7 @@ export function PushPrompt({ context = 'default', showWhenOn = false }: { contex
             at the bottom of Safari.
           </li>
           <li>Choose <b>Add to Home Screen</b>.</li>
-          <li>Open NetworkPulse from your home screen, sign in again with one tap, and turn on notifications.</li>
+          <li>Open hyve5 from your home screen, sign in again with one tap, and turn on notifications.</li>
         </ol>
       )}
 

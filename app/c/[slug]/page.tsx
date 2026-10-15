@@ -5,7 +5,8 @@ import { getSession } from '@/lib/session';
 import { BentoCard } from '@/components/BentoCard';
 import { Avatar } from '@/components/Avatar';
 import { StatusPill } from '@/components/StatusPill';
-import { Check, Pin, Plus } from '@/components/Icons';
+import { Check, Pin } from '@/components/Icons';
+import { BrandMark } from '@/components/BrandMark';
 import { NoteForm } from './NoteForm';
 import { PushPrompt } from '@/components/PushPrompt';
 import { firstName, isLive } from '@/lib/util';
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { supabase } = await getSession();
   const { data } = await supabase.from('profiles').select('full_name, role_line').eq('slug', slug).maybeSingle();
-  return data ? { title: `${data.full_name} · NetworkPulse`, description: data.role_line ?? undefined } : { title: 'NetworkPulse' };
+  return data ? { title: `${data.full_name} · hyve5`, description: data.role_line ?? undefined } : { title: 'hyve5' };
 }
 
 export default async function PublicCard({
@@ -54,7 +55,7 @@ export default async function PublicCard({
   if (sp.swapped && swap && viewer) {
     return (
       <main className="shell">
-        <div className="pill rise" style={{ alignSelf: 'center', height: 34, fontSize: 13, background: 'rgba(30,16,20,.7)', marginTop: 6 }}>
+        <div className="pill rise" style={{ alignSelf: 'center', height: 34, fontSize: 13, background: 'rgba(18, 18, 20,.7)', marginTop: 6 }}>
           <Check size={15} color="#4ADE80" /> Cards swapped with {first}
         </div>
 
@@ -76,8 +77,8 @@ export default async function PublicCard({
         </section>
 
         <div className="glass row" style={{ borderRadius: 26, padding: '14px 16px', gap: 12 }}>
-          <span className="round" style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(255,122,89,.16)', border: '1px solid rgba(255,122,89,.4)' }}>
-            <Pin color="#FF9A80" />
+          <span className="round" style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(255,200,61,.16)', border: '1px solid rgba(255,200,61,.4)' }}>
+            <Pin color="#FFD24D" />
           </span>
           <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.4 }}>
             {swapEvent ? (
@@ -108,7 +109,7 @@ export default async function PublicCard({
   return (
     <main className="shell">
       <div className="topbar">
-        <Link href={user ? '/me' : '/'} className="brand"><span className="brand-mark"><Plus size={14} /></span>NetworkPulse</Link>
+        <Link href={user ? '/me' : '/'} className="brand"><BrandMark /></Link>
         {isOwner && <Link href="/me" className="pill" style={{ textDecoration: 'none' }}>This is your public card</Link>}
       </div>
 

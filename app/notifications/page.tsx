@@ -58,7 +58,7 @@ export default async function NotificationsPage() {
           <span className="label" style={{ padding: '2px 4px 6px' }}>Coming up</span>
           {(upcoming ?? []).map((u) => (
             <Link key={u.id} href={`/connect/${u.swap_id}`} className="row" style={{ gap: 12, padding: '8px 4px', textDecoration: 'none' }}>
-              <Clock size={16} color="#FFB09C" />
+              <Clock size={16} color="#FFD66B" />
               <span style={{ flex: 1, fontSize: 14 }}>{LABEL[u.kind] ?? 'Follow up with'} {nameBySwap.get(u.swap_id)}</span>
               <span className="muted" style={{ fontSize: 12 }}>in {timeLeft(u.due_at)}</span>
             </Link>

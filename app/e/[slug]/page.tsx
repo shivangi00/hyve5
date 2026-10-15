@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getSession } from '@/lib/session';
 import { qrSvg } from '@/lib/qr';
 import { APP_TZ, fmtTime, isLive, siteUrl } from '@/lib/util';
-import { Plus } from '@/components/Icons';
+import { BrandMark } from '@/components/BrandMark';
 import type { EventRow } from '@/lib/types';
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -20,7 +20,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   return (
     <main className="shell">
       <div className="topbar">
-        <Link href="/" className="brand"><span className="brand-mark"><Plus size={14} /></span>NetworkPulse</Link>
+        <Link href="/" className="brand"><BrandMark /></Link>
       </div>
       <section className="glass sheet rise" style={{ alignItems: 'center', textAlign: 'center', gap: 14 }}>
         <span className="label row" style={{ gap: 7 }}>{live && <span className="live-dot" />}{live ? 'Happening now' : 'Event'}</span>

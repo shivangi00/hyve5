@@ -79,7 +79,7 @@ export function FollowUp(props: {
 
   const deadline =
     stage === 'met'
-      ? { title: 'Message within 3 hours', sub: props.deadlines.message === 'overdue' ? 'Past 3 hours, but tonight still counts. Send it now.' : `${props.deadlines.message} left, while the conversation is still fresh.`, pct: props.deadlines.messagePct, color: '#FF7A59', hot: true }
+      ? { title: 'Message within 3 hours', sub: props.deadlines.message === 'overdue' ? 'Past 3 hours, but tonight still counts. Send it now.' : `${props.deadlines.message} left, while the conversation is still fresh.`, pct: props.deadlines.messagePct, color: '#FFC83D', hot: true }
       : stage === 'messaged'
         ? { title: 'Get a call booked this week', sub: props.deadlines.call === 'overdue' ? 'The week is up. One last nudge?' : `${props.deadlines.call} left. We'll nudge you if there's no reply.`, pct: props.deadlines.callPct, color: '#FFB86B', hot: false }
         : { title: stage === 'booked' ? 'Call booked' : 'All done', sub: 'Nice work. Follow-up reminders are cleared.', pct: 100, color: '#4ADE80', hot: false };
@@ -94,7 +94,7 @@ export function FollowUp(props: {
         </ol>
       </section>
 
-      <section className="glass row" style={{ borderRadius: 28, padding: '12px 14px', gap: 14, borderColor: deadline.hot ? 'rgba(255,122,89,.45)' : undefined }}>
+      <section className="glass row" style={{ borderRadius: 28, padding: '12px 14px', gap: 14, borderColor: deadline.hot ? 'rgba(255,200,61,.45)' : undefined }}>
         <span className="ring" style={{ background: `conic-gradient(${deadline.color} ${deadline.pct}%, rgba(255,255,255,.1) 0)` }}>
           <span><Clock /></span>
         </span>
@@ -108,7 +108,7 @@ export function FollowUp(props: {
         <section className="glass sheet" style={{ borderRadius: 32, padding: 14 }}>
           <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
             <span className="label row" style={{ gap: 7 }}>
-              <Sparkle size={14} color="#FFB09C" />
+              <Sparkle size={14} color="#FFD66B" />
               {stage === 'messaged' ? 'Nudge, ready to send' : props.aiUsed ? 'Drafted from your note' : 'Drafted for you'}
             </span>
             <div className="seg" role="group" aria-label="Tone">
@@ -122,7 +122,7 @@ export function FollowUp(props: {
           <label className="sr-only" htmlFor="msg">Message to {props.contact.first}</label>
           <textarea id="msg" className="textarea" rows={7} value={loading ? 'Rewriting…' : text} disabled={loading} onChange={(e) => setText(e.target.value)} style={{ minHeight: 170 }} />
           <label className="row" style={{ gap: 10, fontSize: 13.5, minHeight: 32 }}>
-            <input type="checkbox" checked={withLink} onChange={(e) => setWithLink(e.target.checked)} style={{ width: 20, height: 20, margin: 0, accentColor: '#F5EEEC' }} />
+            <input type="checkbox" checked={withLink} onChange={(e) => setWithLink(e.target.checked)} style={{ width: 20, height: 20, margin: 0, accentColor: '#F3F1EA' }} />
             Add my booking link
           </label>
           <button className="btn btn-primary btn-block" onClick={openLinkedIn}>
@@ -198,7 +198,7 @@ export function FollowUp(props: {
             <span
               style={{
                 width: 10, height: 10, flex: 'none', borderRadius: 5,
-                ...(r.state === 'set' ? { background: 'var(--accent)', animation: 'pulse 1.8s ease-out infinite' } : { border: '1.5px solid rgba(245,238,236,.4)' }),
+                ...(r.state === 'set' ? { background: 'var(--accent)', animation: 'pulse 1.8s ease-out infinite' } : { border: '1.5px solid rgba(243, 241, 234,.4)' }),
               }}
             />
             <div style={{ flex: 1, minWidth: 0 }}>

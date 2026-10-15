@@ -1,6 +1,6 @@
--- NetworkPulse schema
+-- hyve5 schema
 -- Paste this whole file into Supabase → SQL Editor → New query → Run.
--- Safe to re-run: it drops and recreates the NetworkPulse objects (and their data).
+-- Safe to re-run: it drops and recreates the hyve5 objects (and their data).
 
 create extension if not exists pgcrypto;
 

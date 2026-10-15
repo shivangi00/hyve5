@@ -22,7 +22,7 @@ export function ShareToggle({
   async function shareLink() {
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'My NetworkPulse card', url: cardUrl });
+        await navigator.share({ title: 'My hyve5 card', url: cardUrl });
         return;
       }
       await navigator.clipboard.writeText(cardUrl);
@@ -62,7 +62,7 @@ export function ShareToggle({
 
       <div className="bottom" style={{ flexDirection: 'row', gap: 10 }}>
         <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => setShowQr((v) => !v)}>
-          <Qr color="#1d1114" />
+          <Qr color="#121214" />
           {showQr ? 'Back to my card' : 'Share my card'}
         </button>
         <button className="round" style={{ width: 56, height: 56 }} aria-label="Share or copy my card link" onClick={shareLink}>

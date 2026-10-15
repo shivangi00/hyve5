@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/session';
-import { Plus } from '@/components/Icons';
+import { BrandMark } from '@/components/BrandMark';
 
 export default async function Home() {
   const { user, profile } = await getSession();
@@ -11,7 +11,7 @@ export default async function Home() {
   return (
     <main className="shell">
       <div className="topbar">
-        <span className="brand"><span className="brand-mark"><Plus size={14} /></span>NetworkPulse</span>
+        <span className="brand"><BrandMark tagline /></span>
       </div>
 
       <section className="glass build-grid rise" aria-hidden="true" style={{ marginTop: 24 }}>
@@ -25,7 +25,7 @@ export default async function Home() {
       <div className="bottom">
         <section className="glass sheet">
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.12 }}>
-            Swap cards tonight. Book the call this week.
+            Swap. Select. Connect.
           </h1>
           <p className="muted" style={{ margin: 0, fontSize: 14.5, lineHeight: 1.45 }}>
             A bento card anyone can scan without an app, a stack to sort on the ride home, and reminders that make sure the follow-up actually happens.

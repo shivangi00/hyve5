@@ -7,7 +7,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: process.env.REMINDER_FROM_EMAIL || 'NetworkPulse <onboarding@resend.dev>',
+        from: process.env.REMINDER_FROM_EMAIL || 'hyve5 <onboarding@resend.dev>',
         to: [to],
         subject,
         html,
@@ -51,12 +51,12 @@ export function reminderEmail(opts: { kind: string; contactName: string; eventNa
   };
   const c = copy[opts.kind] ?? copy.message_3h!;
   const html = `
-  <div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;background:#1d1114;padding:32px 16px;">
-    <div style="max-width:440px;margin:0 auto;background:#2a181d;border:1px solid #3d2a30;border-radius:28px;padding:28px;color:#F5EEEC;">
-      <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#c9b8b4;margin-bottom:14px;">NetworkPulse</div>
+  <div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;background:#121214;padding:32px 16px;">
+    <div style="max-width:440px;margin:0 auto;background:#141416;border:1px solid #2d2d32;border-radius:28px;padding:28px;color:#F3F1EA;">
+      <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#b8b6ae;margin-bottom:14px;">hyve5</div>
       <div style="font-size:20px;font-weight:600;line-height:1.3;margin-bottom:10px;">${esc(c.subject)}</div>
-      <div style="font-size:15px;line-height:1.55;color:#e4d8d5;margin-bottom:22px;">${c.line}</div>
-      <a href="${opts.link}" style="display:inline-block;background:#F5EEEC;color:#1d1114;text-decoration:none;font-weight:600;padding:14px 22px;border-radius:999px;">${c.cta}</a>
+      <div style="font-size:15px;line-height:1.55;color:#e6e4dc;margin-bottom:22px;">${c.line}</div>
+      <a href="${opts.link}" style="display:inline-block;background:#F3F1EA;color:#121214;text-decoration:none;font-weight:600;padding:14px 22px;border-radius:999px;">${c.cta}</a>
     </div>
   </div>`;
   return { subject: c.subject, html };

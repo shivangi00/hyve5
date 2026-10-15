@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { LegalPage, contactEmail } from '../LegalPage';
 
-export const metadata: Metadata = { title: 'Terms of service · NetworkPulse' };
+export const metadata: Metadata = { title: 'Terms of service · hyve5' };
 
 export default function TermsPage() {
   const email = contactEmail();
   return (
     <LegalPage title="Terms of service" updated="14 October 2026">
-      <p>By using NetworkPulse you agree to these terms. NetworkPulse is an early preview, offered free of charge.</p>
+      <p>By using hyve5 you agree to these terms. hyve5 is an early preview, offered free of charge.</p>
 
       <h2>Your card and content</h2>
       <ul>
@@ -18,7 +18,7 @@ export default function TermsPage() {
 
       <h2>The service</h2>
       <ul>
-        <li>NetworkPulse is provided as it is, while it is being developed. Features may change, and it may sometimes be unavailable.</li>
+        <li>hyve5 is provided as it is, while it is being developed. Features may change, and it may sometimes be unavailable.</li>
         <li>Reminders and notifications are best effort; please don't rely on them for anything critical.</li>
         <li>We may suspend accounts that break these terms.</li>
       </ul>

@@ -117,7 +117,7 @@ export default async function RideHomePage() {
                   <span style={{ display: 'block', fontSize: 14.5, fontWeight: 600 }}>{c.full_name}</span>
                   <span className="muted" style={{ display: 'block', fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.role_line}</span>
                 </span>
-                <span style={{ fontSize: 12, color: deadline.hot ? '#FFC2B3' : 'var(--ink-2)', textAlign: 'right' }}>{deadline.text}</span>
+                <span style={{ fontSize: 12, color: deadline.hot ? '#FFE08A' : 'var(--ink-2)', textAlign: 'right' }}>{deadline.text}</span>
               </Link>
             );
           })}

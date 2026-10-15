@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Back } from '@/components/Icons';
 
 export function contactEmail() {
-  return (process.env.VAPID_SUBJECT || '').replace(/^mailto:/, '') || 'the email on the NetworkPulse home page';
+  return (process.env.VAPID_SUBJECT || '').replace(/^mailto:/, '') || 'the email on the hyve5 home page';
 }
 
 export function LegalPage({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {

@@ -1,4 +1,4 @@
-/* NetworkPulse service worker: shows push notifications and opens the right screen on tap. */
+/* hyve5 service worker: shows push notifications and opens the right screen on tap. */
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
@@ -8,9 +8,9 @@ self.addEventListener('push', (event) => {
   try {
     data = event.data ? event.data.json() : {};
   } catch (e) {
-    data = { title: 'NetworkPulse', body: event.data ? event.data.text() : '' };
+    data = { title: 'hyve5', body: event.data ? event.data.text() : '' };
   }
-  const title = data.title || 'NetworkPulse';
+  const title = data.title || 'hyve5';
   event.waitUntil(
     self.registration.showNotification(title, {
       body: data.body || '',

@@ -4,16 +4,18 @@
 -- Before running:
 --   1) Supabase → Database → Extensions: enable "pg_cron" and "pg_net".
 --   2) Replace YOUR-APP-URL and YOUR-CRON-SECRET below (same value as CRON_SECRET in Vercel).
+-- Safe to re-run: it removes any earlier schedule first (including one from before the hyve5 rename).
 
-select cron.unschedule('networkpulse-reminders')
-where exists (select 1 from cron.job where jobname = 'networkpulse-reminders');
+select cron.unschedule(jobname)
+from cron.job
+where jobname in ('hyve5-reminders', 'networkpulse-reminders');
 
 select cron.schedule(
-  'networkpulse-reminders',
+  'hyve5-reminders',
   '*/10 * * * *',
   $$
   select net.http_get(
-    url := 'https://YOUR-APP-URL/api/cron/reminders',
+    url := 'https://hyve5.vercel.app/api/cron/reminders',
     headers := jsonb_build_object('Authorization', 'Bearer YOUR-CRON-SECRET')
   );
   $$

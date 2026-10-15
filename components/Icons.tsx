@@ -57,3 +57,11 @@ export const Chat = ({ size = 20, color = 'currentColor', width = 1.9 }: P) => (
 export const Pencil = ({ size = 18, color = 'currentColor', width = 1.8 }: P) => (
   <svg {...base(size, color, width)}><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></svg>
 );
+
+/** hyve5 brand mark: a hive cell with a glowing core. */
+export const HexMark = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden={true}>
+    <path d="M12 2.6 20.1 7.3v9.4L12 21.4 3.9 16.7V7.3z" stroke="#F3F1EA" strokeWidth="1.8" strokeLinejoin="round" />
+    <path d="M12 8.4 15.1 10.2v3.6L12 15.6 8.9 13.8v-3.6z" fill="#FFC83D" />
+  </svg>
+);

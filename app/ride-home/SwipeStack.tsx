@@ -88,7 +88,7 @@ export function SwipeStack({ cards }: { cards: StackCard[] }) {
       <div className="deck">
         {cards[idx + 2] && <div className="deck-shadow" style={{ left: 18, right: 18, top: 28, bottom: 28 }} />}
         {cards[idx + 1] && (
-          <div className="deck-shadow" style={{ left: 9, right: 9, top: 14, bottom: 14, background: 'rgba(36,20,25,.72)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 14 }}>
+          <div className="deck-shadow" style={{ left: 9, right: 9, top: 14, bottom: 14, background: 'rgba(22, 22, 24,.72)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 14 }}>
             <span style={{ fontSize: 12, color: 'var(--ink-3)' }}>Next: {cards[idx + 1]!.name}</span>
           </div>
         )}
@@ -157,7 +157,7 @@ export function SwipeStack({ cards }: { cards: StackCard[] }) {
           </div>
 
           <div className="why">
-            <Sparkle color="#FFB09C" />
+            <Sparkle color="#FFD66B" />
             <span>{top.strong ? 'Strong match: ' : ''}{top.why}</span>
           </div>
         </article>
@@ -171,10 +171,10 @@ export function SwipeStack({ cards }: { cards: StackCard[] }) {
           <Chat />
         </Link>
         <button className="round lg" aria-label="Connect: add to follow-ups" onClick={() => decide(1)}>
-          <Check size={26} color="#1d1114" />
+          <Check size={26} color="#121214" />
         </button>
       </div>
-      <div style={{ textAlign: 'center', fontSize: 11.5, color: 'rgba(245,238,236,.8)' }}>
+      <div style={{ textAlign: 'center', fontSize: 11.5, color: 'rgba(243, 241, 234,.8)' }}>
         Swipe right to follow up · left to archive quietly
         {last && idx > 0 && (
           <>

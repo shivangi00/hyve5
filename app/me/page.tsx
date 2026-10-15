@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { requireProfile } from '@/lib/session';
 import { BentoCard } from '@/components/BentoCard';
-import { Pencil, Plus, Stack } from '@/components/Icons';
+import { Pencil, Stack } from '@/components/Icons';
+import { BrandMark } from '@/components/BrandMark';
 import { ShareToggle } from './ShareToggle';
 import { BellLink } from '@/components/BellLink';
 import { PushPrompt } from '@/components/PushPrompt';
@@ -35,7 +36,7 @@ export default async function MePage() {
   return (
     <main className="shell">
       <div className="topbar">
-        <Link href="/me" className="brand"><span className="brand-mark"><Plus size={14} /></span>NetworkPulse</Link>
+        <Link href="/me" className="brand"><BrandMark /></Link>
         <div className="row" style={{ gap: 8 }}>
           <Link href="/me/edit" className="icon-btn" aria-label="Edit my card"><Pencil /></Link>
           <BellLink userId={profile.id} />

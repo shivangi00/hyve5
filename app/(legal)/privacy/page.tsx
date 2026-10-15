@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import { LegalPage, contactEmail } from '../LegalPage';
 
-export const metadata: Metadata = { title: 'Privacy policy · NetworkPulse' };
+export const metadata: Metadata = { title: 'Privacy policy · hyve5' };
 
 export default function PrivacyPage() {
   const email = contactEmail();
   return (
     <LegalPage title="Privacy policy" updated="14 October 2026">
       <p>
-        NetworkPulse lets you swap digital business cards at events and follow up afterwards. This page explains what we collect, why, and how to have it deleted.
+        hyve5 lets you swap digital business cards at events and follow up afterwards. This page explains what we collect, why, and how to have it deleted.
       </p>
 
       <h2>What we collect</h2>
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
 
       <h2>Use of Google user data</h2>
       <p>
-        We use only your basic Google profile (name, email, photo) to create your account and card. NetworkPulse's use of information received from Google APIs adheres to the{' '}
+        We use only your basic Google profile (name, email, photo) to create your account and card. hyve5's use of information received from Google APIs adheres to the{' '}
         <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noreferrer">Google API Services User Data Policy</a>, including the Limited Use requirements.
       </p>
 
