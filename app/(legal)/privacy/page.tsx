@@ -31,6 +31,7 @@ export default function PrivacyPage() {
       <h2>Who can see what</h2>
       <ul>
         <li><b>Public:</b> your card (name, photo, role, status, topics, links, open times).</li>
+        <li><b>People going to the same event:</b> that you're going, with your name, photo and role. Anyone with the event link sees only photos and a head count. Leave the event (Edit card → event → Leave) to remove yourself.</li>
         <li><b>Only people you've swapped with:</b> your email address.</li>
         <li><b>Only you:</b> your notes, your follow-up list and your reminders.</li>
       </ul>

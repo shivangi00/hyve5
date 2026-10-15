@@ -19,9 +19,11 @@ type Props = {
   email?: string | null;
   /** Public card only: has the viewer already swapped with this person? */
   swapped?: boolean;
+  /** Owner card: other people attending the same event. */
+  going?: { id: string; full_name: string; avatar_url: string | null }[];
 };
 
-export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer, email, swapped }: Props) {
+export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer, email, swapped, going = [] }: Props) {
   const live = isLive(event);
   const upcoming = !live && isUpcoming(event);
   const openSlots = slots
@@ -61,12 +63,24 @@ export function BentoCard({ profile, event, swappedHere = 0, slots, mode, viewer
             </div>
           </div>
           {mode === 'owner' ? (
-            <div className="row" style={{ justifyContent: 'space-between', fontSize: 12, color: 'var(--ink-2)' }}>
-              <span>{live ? `${swappedHere} swapped` : 'Coming up'}</span>
-              <span className="row" style={{ gap: 10 }}>
-                {event.organised && event.created_by === profile.id && <Link href={`/e/${event.slug}`} style={{ fontSize: 12 }}>Check-in QR</Link>}
+            <div className="stack" style={{ gap: 8, fontSize: 12, color: 'var(--ink-2)' }}>
+              {/* Who's going (from invites or check-in) — tap for the list and the invite link. */}
+              <Link href={`/e/${event.slug}`} className="row" style={{ gap: 8, textDecoration: 'none', color: 'inherit' }}>
+                {going.length > 0 ? (
+                  <>
+                    <span className="avatar-stack">
+                      {going.slice(0, 3).map((p) => <Avatar key={p.id} name={p.full_name} url={p.avatar_url} size={22} />)}
+                    </span>
+                    <span>{going.length} going</span>
+                  </>
+                ) : (
+                  <span style={{ color: 'var(--accent)' }}>Invite people going</span>
+                )}
+              </Link>
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span>{live ? `${swappedHere} swapped` : 'Coming up'}</span>
                 <Link href="/events/new" style={{ fontSize: 12 }}>Change</Link>
-              </span>
+              </div>
             </div>
           ) : (
             <div style={{ fontSize: 12, color: 'var(--ink-2)' }}>{live ? 'Swap to join the same stack' : 'See you there'}</div>

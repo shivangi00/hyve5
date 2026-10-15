@@ -29,6 +29,10 @@ export default async function MePage() {
       : Promise.resolve(0),
     supabase.from('profile_private').select('email').eq('id', profile.id).maybeSingle(),
   ]);
+  const { data: goingData } = event
+    ? await supabase.from('profiles').select('id, full_name, avatar_url').eq('active_event_id', event.id).eq('onboarded', true).neq('id', profile.id).limit(50)
+    : { data: [] };
+  const going = (goingData ?? []) as { id: string; full_name: string; avatar_url: string | null }[];
   const email = (priv as { email: string | null } | null)?.email ?? user.email ?? null;
 
   const cardUrl = `${siteUrl()}/c/${profile.slug}`;
@@ -54,7 +58,7 @@ export default async function MePage() {
         cardUrl={cardUrl}
         eventName={live && event ? event.name : null}
         below={<PushPrompt />}
-        card={<BentoCard profile={profile} event={event} swappedHere={swappedHere} slots={(slots as Slot[]) ?? []} mode="owner" email={email} />}
+        card={<BentoCard profile={profile} event={event} swappedHere={swappedHere} slots={(slots as Slot[]) ?? []} mode="owner" email={email} going={going} />}
       />
     </main>
   );

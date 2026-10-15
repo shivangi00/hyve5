@@ -319,3 +319,19 @@ label.choice { cursor: pointer; }
 .favicon { border-radius: 4px; display: block; }
 /* Site icons sit on a light chip so dark logos (GitHub, X…) stay visible on the dark card. */
 .favicon { background: #f3f1ea; padding: 3px; border-radius: 7px; box-sizing: content-box; }
+
+/* ── Event invites ── */
+.avatar-stack { display: flex; }
+.avatar-stack > * { margin-left: -8px; box-shadow: 0 0 0 2px #161618; }
+.avatar-stack > *:first-child { margin-left: 0; }
+.invite-preview {
+  white-space: pre-wrap; font-size: 13.5px; line-height: 1.45; color: var(--ink-2);
+  background: rgba(255, 255, 255, .04); border: 1px solid var(--line-2); border-radius: 16px; padding: 12px 14px; word-break: break-word;
+}
+
+/* ── Google's own sign-in button ── */
+.gsi-box { position: relative; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+.gsi-cover {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 2px;
+  border-radius: 22px; background: rgba(22, 22, 24, .92); border: 1px solid var(--line-2); font-size: 14px; color: var(--ink-2);
+}

@@ -31,13 +31,14 @@ export async function createEvent(formData: FormData) {
   const { data: ev, error } = await supabase
     .from('events')
     .insert({ slug: slugify(name), name, venue, starts_at, ends_at, organised, created_by: user!.id })
-    .select('id')
+    .select('id, slug')
     .single();
   if (error || !ev) redirect(`/events/new?error=${encodeURIComponent(error?.message ?? 'Could not save')}`);
 
   await supabase.from('profiles').update({ active_event_id: ev!.id }).eq('id', user!.id);
   revalidatePath('/me');
-  redirect('/me');
+  // Straight to the event page: invite people and see who's going.
+  redirect(`/e/${ev!.slug}?joined=1`);
 }
 
 export async function leaveEvent() {

@@ -32,11 +32,9 @@ export default async function NewEventPage({ searchParams }: { searchParams: Pro
           <div style={{ fontSize: 18, fontWeight: 600 }}>{current.name}</div>
           <div className="muted" style={{ fontSize: 13 }}>{fmtEventWhen(current, APP_TZ)}{current.venue ? ` · ${current.venue}` : ''}</div>
           <div className="row" style={{ justifyContent: 'space-between' }}>
-            {current.organised && current.created_by === profile.id ? (
-              <Link href={`/e/${current.slug}`} style={{ fontSize: 13.5, color: 'var(--ink-2)' }}>Check-in QR for your guests</Link>
-            ) : (
-              <span />
-            )}
+            <Link href={`/e/${current.slug}`} style={{ fontSize: 13.5, color: 'var(--accent)' }}>
+              {current.organised && current.created_by === profile.id ? "Invite people · who's going · check-in QR" : "Invite people · who's going"}
+            </Link>
             <form action={leaveEvent}><SubmitButton className="link-btn" pendingText="Leaving…">Leave</SubmitButton></form>
           </div>
         </section>
