@@ -8,6 +8,7 @@ import { BrandMark } from '@/components/BrandMark';
 import { Avatar } from '@/components/Avatar';
 import { InviteToEvent } from '@/components/InviteToEvent';
 import { PendingLink } from '@/components/PendingLink';
+import { WhoIsGoing, type Person } from './WhoIsGoing';
 import { Back } from '@/components/Icons';
 import type { EventRow, Profile } from '@/lib/types';
 
@@ -47,6 +48,34 @@ export default async function EventPage({
   ]);
   const going = ((people ?? []) as Attendee[]).filter((p) => p.id !== profile?.id);
   const inviter = inviterData as Attendee | null;
+
+  // Swap state for each person: already swapped, request sent, or a request waiting for you.
+  let peopleForList: Person[] = [];
+  if (attending && profile) {
+    const ids = going.map((p) => p.id);
+    const [{ data: mySwaps }, { data: reqs }] = ids.length
+      ? await Promise.all([
+          supabase.from('swaps').select('contact_id').eq('owner_id', profile.id).is('deleted_at', null).in('contact_id', ids),
+          supabase.from('swap_requests').select('id, from_id, to_id, status').eq('status', 'pending').or(`from_id.eq.${profile.id},to_id.eq.${profile.id}`),
+        ])
+      : [{ data: [] }, { data: [] }];
+    const swapped = new Set(((mySwaps ?? []) as { contact_id: string }[]).map((r) => r.contact_id));
+    const pending = (reqs ?? []) as { id: string; from_id: string; to_id: string }[];
+    peopleForList = going.map((p) => {
+      const incoming = pending.find((r) => r.from_id === p.id && r.to_id === profile.id);
+      const sent = pending.find((r) => r.from_id === profile.id && r.to_id === p.id);
+      return {
+        id: p.id,
+        name: p.full_name,
+        avatar: p.avatar_url,
+        role: p.role_line,
+        state: swapped.has(p.id) ? 'swapped' : incoming ? 'incoming' : sent ? 'sent' : 'none',
+        requestId: incoming?.id,
+      };
+    });
+    // Requests waiting for you first, then everyone else alphabetically.
+    peopleForList.sort((a, b) => Number(b.state === 'incoming') - Number(a.state === 'incoming') || a.name.localeCompare(b.name));
+  }
 
   const when = fmtEventWhen(event, APP_TZ);
   // The invite carries your card, so people who join show up for you (and you get a heads-up).
@@ -106,25 +135,7 @@ export default async function EventPage({
         </section>
       )}
 
-      {attending && (
-        <section className="glass sheet" style={{ gap: 6 }}>
-          <span className="label">Who's going · {going.length}</span>
-          {going.length === 0 ? (
-            <p className="muted" style={{ margin: 0, fontSize: 14 }}>No one else yet. Share the invite and they'll appear here.</p>
-          ) : (
-            going.map((p) => (
-              <div key={p.id} className="row" style={{ gap: 12, padding: '6px 0' }}>
-                <Avatar name={p.full_name} url={p.avatar_url} size={40} />
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 14.5, fontWeight: 600 }}>{p.full_name}</div>
-                  {p.role_line && <div className="muted" style={{ fontSize: 12.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.role_line}</div>}
-                </div>
-              </div>
-            ))
-          )}
-          {going.length > 0 && <p className="hint" style={{ margin: '4px 0 0' }}>When you meet, scan each other's card QR to swap. You'll both land in this event's stack.</p>}
-        </section>
-      )}
+      {attending && <WhoIsGoing people={peopleForList} eventId={event.id} eventSlug={event.slug} />}
 
       {svg && (
         <section className="glass sheet" style={{ alignItems: 'center', textAlign: 'center', gap: 10 }}>

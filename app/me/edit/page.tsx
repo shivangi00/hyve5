@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { requireProfile } from '@/lib/session';
 import { Back } from '@/components/Icons';
 import { APP_TZ, STATUS, fmtDayDate, fmtTime } from '@/lib/util';
-import { addSlot, chooseIdentity, deleteAccount, deleteSlot, saveProfile, signOut } from './actions';
+import { addSlot, chooseIdentity, deleteSlot, saveProfile, signOut } from './actions';
+import { DeleteAccount } from './DeleteAccount';
 import { LinkedInField } from '@/components/LinkedInField';
 import { ConnectAccount } from './ConnectAccount';
 import { Avatar } from '@/components/Avatar';
@@ -147,13 +148,8 @@ export default async function EditPage({ searchParams }: { searchParams: Promise
             Permanently deletes your card, contacts, notes, bookable times and reminders, and removes you from other people's contacts. This can't be undone.
           </p>
         </div>
-        {sp.account === 'confirm' && <p className="error" role="alert" style={{ margin: 0 }}>Type delete in the box to confirm.</p>}
         {sp.account === 'unavailable' && <p className="error" role="alert" style={{ margin: 0 }}>Account deletion isn't set up on this server yet (missing service key). Nothing was deleted.</p>}
-        <form action={deleteAccount} className="stack" style={{ gap: 8 }}>
-          <label className="label" htmlFor="confirm">Type delete to confirm</label>
-          <input id="confirm" name="confirm" className="input" autoComplete="off" autoCapitalize="off" placeholder="delete" />
-          <SubmitButton className="btn btn-block btn-danger" pendingText="Deleting your account…">Delete my account</SubmitButton>
-        </form>
+        <DeleteAccount fullName={profile.full_name} error={sp.account} />
       </section>
     </main>
   );

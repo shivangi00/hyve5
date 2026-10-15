@@ -93,6 +93,10 @@ export async function deleteAccount(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   if (String(formData.get('confirm') || '').trim().toLowerCase() !== 'delete') redirect('/me/edit?account=confirm#danger');
+  // Second check: the full name typed in the confirmation popup.
+  const { data: me } = await supabase.from('profiles').select('full_name').eq('id', user!.id).maybeSingle();
+  const norm = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase();
+  if (!me || norm(String(formData.get('full_name') || '')) !== norm(me.full_name)) redirect('/me/edit?account=name#danger');
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) redirect('/me/edit?account=unavailable#danger');
 
   const admin = createAdminClient();

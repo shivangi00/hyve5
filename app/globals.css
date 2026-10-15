@@ -335,3 +335,7 @@ label.choice { cursor: pointer; }
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 2px;
   border-radius: 22px; background: rgba(22, 22, 24, .92); border: 1px solid var(--line-2); font-size: 14px; color: var(--ink-2);
 }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.request-banner { gap: 12px; padding: 14px 16px; border-radius: 22px; text-decoration: none; color: var(--ink); font-size: 14px; }
+.badge.static { position: static; min-width: 24px; height: 24px; display: inline-grid; place-items: center; }
+.del-list { margin: 0; padding-left: 18px; display: grid; gap: 4px; }

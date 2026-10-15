@@ -5,7 +5,7 @@ import { useState } from 'react';
 /** Share an event invite: the phone's share sheet where available, otherwise copy the message. */
 export function InviteToEvent({ link, eventName, when, compact }: { link: string; eventName: string; when: string; compact?: boolean }) {
   const [status, setStatus] = useState<string | null>(null);
-  const message = `Hey! I'm going to ${eventName} (${when}) 👋 I'm trying hyve5 to swap contacts there. Tap to say you're going and set up your card before, it takes a minute and there's no app: ${link}\nThen we just scan and swap when we meet!`;
+  const message = `Hey! I'm going to ${eventName} (${when}) 👋 I'm trying hyve5 to swap contacts there. Tap to say you're going and set up your card before, it takes a minute and there's no app: ${link}\n\nTurn on notifications when it asks, so you see swap requests and follow-up nudges. Then we can swap from the "who's going" list or just scan each other's QR when we meet!`;
 
   function flash(t: string) {
     setStatus(t);

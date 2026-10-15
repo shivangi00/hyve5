@@ -35,6 +35,16 @@ export default async function MePage() {
   const going = (goingData ?? []) as { id: string; full_name: string; avatar_url: string | null }[];
   const email = (priv as { email: string | null } | null)?.email ?? user.email ?? null;
 
+  // Swap requests waiting for you (sent from an event's Who's going list).
+  const { data: incomingReqs } = await supabase.from('swap_requests').select('id, event_id').eq('to_id', profile.id).eq('status', 'pending');
+  const waiting = (incomingReqs ?? []) as { id: string; event_id: string | null }[];
+  let requestsHref = '/notifications';
+  if (waiting.length && waiting[0]!.event_id) {
+    const evId = waiting[0]!.event_id;
+    const { data: evRow } = evId === event?.id ? { data: event } : await supabase.from('events').select('slug').eq('id', evId).maybeSingle();
+    if (evRow?.slug) requestsHref = `/e/${evRow.slug}#requests`;
+  }
+
   const cardUrl = `${siteUrl()}/c/${profile.slug}`;
   const svg = await qrSvg(cardUrl);
   const live = isLive(event);
@@ -57,7 +67,18 @@ export default async function MePage() {
         qrSvg={svg}
         cardUrl={cardUrl}
         eventName={live && event ? event.name : null}
-        below={<PushPrompt />}
+        below={
+          <>
+            {waiting.length > 0 && (
+              <Link href={requestsHref} className="glass row request-banner">
+                <span className="badge static">{waiting.length}</span>
+                <span style={{ flex: 1 }}>{waiting.length === 1 ? 'Someone wants to swap cards with you' : `${waiting.length} people want to swap cards with you`}</span>
+                <span style={{ color: 'var(--accent)', fontWeight: 600 }}>View</span>
+              </Link>
+            )}
+            <PushPrompt />
+          </>
+        }
         card={<BentoCard profile={profile} event={event} swappedHere={swappedHere} slots={(slots as Slot[]) ?? []} mode="owner" email={email} going={going} />}
       />
     </main>
